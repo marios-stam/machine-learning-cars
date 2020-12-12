@@ -22,7 +22,6 @@ def main():
                 running = False
                                 
         pygame.display.flip()
-
         screen.fill((255, 255, 255))
 
         player.handle_keys()
