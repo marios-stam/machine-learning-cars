@@ -1,14 +1,18 @@
 import pygame, sys
 from  colors import *
 from car import *
+from track import *
 from pygame.locals import *
 
-screen = pygame.display.set_mode((600, 600))
-pygame.display.set_caption("LEVEL 2 = Find the Correct Square!")
+windowLenWidth=(1200, 800)
+screen = pygame.display.set_mode(windowLenWidth)
+pygame.display.set_caption("Machine Learning Cars")
 
 clock = pygame.time.Clock()
 
 player = Player(screen)
+track=track(screen,windowLenWidth)
+
 def main():
     pygame.init()
 
@@ -22,11 +26,23 @@ def main():
                 running = False
                                 
         pygame.display.flip()
-        screen.fill((255, 255, 255))
-
+        #print(pygame.sprite.collide_mask(player,track))
+        
+        
+        player.collide_with(track)            
+        
+        track.draw()
         player.handle_keys()
         player.draw()
         player.updateDynamics()
-        pygame.display.update()        
+        
+        olist = track.mask.outline()
+        pygame.draw.lines(track.image,(255,0,0),1,olist) 
+
+        olist = player.mask.outline()
+        pygame.draw.lines(track.image,(0,255,0),1,olist) 
+
+        player.getDistances()
+        pygame.display.update()
         clock.tick(30)
 main()
