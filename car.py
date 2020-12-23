@@ -85,23 +85,18 @@ class Player(pygame.sprite.Sprite):
         self.drawDistances()
 
     def drawDistances(self):
-        font = pygame.font.Font('freesansbold.ttf', 32)
+        font = pygame.font.Font('freesansbold.ttf', 20)
         white = (255, 255, 255)
         green = (0, 255, 0)
         blue = (0, 0, 128)
-        # create a text suface object,
-        # on which text is drawn on it.
-        text = font.render( str(self.distances[0]) , True, white, None)
-
-        # create a rectangular object for the
-        # text surface object
-        textRect = text.get_rect()
-
-        # set the center of the rectangular object.
-        textRect.center = (1000, 40)
         
-        self.screen.blit(text, textRect)
- 
+        y_pos=20
+        for distance in self.distances:
+            text = font.render( str(int(distance)) , True, white, None)
+            textRect = text.get_rect()
+            textRect.center = (1150,y_pos)
+            self.screen.blit(text, textRect)
+            y_pos+=20    
 
 
     def collide_with(self,obj):
@@ -127,10 +122,7 @@ class Player(pygame.sprite.Sprite):
         distances=[]
         for i in [ -4, -2, -1, 0, 1, 2, 4]:
             distances.append( self.getDistanceOfAngle(theta+i*dtheta) )
-            
-            if i==0 :continue
-            distances.append( self.getDistanceOfAngle(theta-i*dtheta) )
-        
+
         self.distances=distances
 
             
