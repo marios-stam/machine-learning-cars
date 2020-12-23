@@ -4,11 +4,12 @@ from  colors import WHITE
 from math import sin,cos,tan,radians,degrees,pi,atan,sqrt
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self,screen,position=pos(64, 54)):
+    def __init__(self,screen,TrackObj,position=pos(64, 54)):
+        pygame.font.init()
         self.screen=screen
-        
+        self.track=TrackObj
         self.delta=0
-        
+        self.distances=[0,0,0,0,0,0,0]
         self.length=60
         self.width=30
         self.l_r=sqrt( pow(self.width,2)+ pow(self.length,2) )/2
@@ -35,7 +36,10 @@ class Player(pygame.sprite.Sprite):
         if not self.canMove:
             self.forward=0
             return
-
+        
+        #mouse_pos= pygame.mouse.get_pos()
+        #print(mouse_pos,self.screen.get_height(),self.screen.get_width() )
+        
         key = pygame.key.get_pressed()
         if key[pygame.K_LEFT]:
             self.delta=self.maxSteeringAngle                    
@@ -78,6 +82,27 @@ class Player(pygame.sprite.Sprite):
         self.screen.blit(self.image, self.rect)
         pygame.draw.rect(self.screen, (255, 0, 0),self.rect, 2)
         pygame.draw.circle(self.screen, (0, 0, 255), self.rect.center, 2)
+        self.drawDistances()
+
+    def drawDistances(self):
+        font = pygame.font.Font('freesansbold.ttf', 32)
+        white = (255, 255, 255)
+        green = (0, 255, 0)
+        blue = (0, 0, 128)
+        # create a text suface object,
+        # on which text is drawn on it.
+        text = font.render( str(self.distances[0]) , True, white, None)
+
+        # create a rectangular object for the
+        # text surface object
+        textRect = text.get_rect()
+
+        # set the center of the rectangular object.
+        textRect.center = (1000, 40)
+        
+        self.screen.blit(text, textRect)
+ 
+
 
     def collide_with(self,obj):
         x_offset = obj.rect.left - self.rect.left
@@ -85,31 +110,71 @@ class Player(pygame.sprite.Sprite):
         
         area=self.mask.overlap_area(obj.mask, (x_offset,y_offset) ) 
         if(area<1000):
-            #print("OPA")
             self.canMove=False
+            return True
         else:
-            #print("OK")
-            pass
-
+            return False
+    
+    def pixelOverlapsTrack(self,pixel):
+        return  self.track.mask.get_at(pixel)==1
+            
     
     def getDistances(self):
         
         theta=self.orientation
-        if theta%pi/2==0:
-            return
+        dtheta=pi/12
+        
+        distances=[]
+        for i in [ -4, -2, -1, 0, 1, 2, 4]:
+            distances.append( self.getDistanceOfAngle(theta+i*dtheta) )
+            
+            if i==0 :continue
+            distances.append( self.getDistanceOfAngle(theta-i*dtheta) )
+        
+        self.distances=distances
+
+            
+    def getDistanceOfAngle(self,theta):
         x,y=self.rect.center
         
-        
-        
-                    
         c=y-tan(-theta)*x
         
         theta_check=((theta)%(2*pi))/pi 
-        if theta_check>1.5 or theta_check<0.5 :
-            xn=x+20
-        else:
-            xn=x-20
-        yn=xn*tan(-theta)+c
 
-        pygame.draw.line(self.screen, (255,0,0), (x,y),(xn,yn), 2)
+        pointing=0
+        if theta_check>1.5 or theta_check<0.5 :
+            pointing=1
+        else:
+            pointing=-1
         
+        step=0.5
+        xn,yn=x,y
+        normalised_pixel=(int(xn), int(yn))
+        screen_height,screen_width=self.screen.get_height(),self.screen.get_width()
+        
+        check=self.pixelOverlapsTrack( (xn,yn) )
+        while( check ):
+            xn+=pointing*step 
+            yn=xn*tan(-theta)+c
+            
+            outOfBounds=False
+            
+            if yn>screen_height:
+                print("opa")
+                #yn=int(screen_height)
+                yn=799
+                outOfBounds=True
+            if xn>screen_width:
+                print("opa2")
+                #xn=int(screen_width)
+                xn=1199
+                outOfBounds=True
+
+            normalised_pixel=(int(xn), int(yn))
+            check=self.pixelOverlapsTrack( normalised_pixel )
+        
+        
+        pygame.draw.line(self.screen, (255,0,0), (x,y),normalised_pixel, 2)
+        pygame.draw.circle(self.screen, (0, 0, 255),normalised_pixel , 8)
+
+        return sqrt( (x-xn)**2 + (y-yn)**2)
