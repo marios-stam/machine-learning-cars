@@ -1,6 +1,8 @@
 from car import Player
 from position import pos
 from geneticAlgorithms import ga
+import pygame 
+from  colors import WHITE
 
 class Generation():
     def __init__(self,screen,race_track,offsprings):
@@ -9,7 +11,8 @@ class Generation():
         if (offsprings==[]):
             popNumber=25
             self.randomInitialise( popNumber )
-            
+        self.popNumber=0
+
     def randomInitialise(self,popNumber):
         population=[]
         for i in range(popNumber):
@@ -39,6 +42,7 @@ class Generation():
             counter+=1
             self.scoresDict[dead.score]=dead.AI.getWeightsVector()
             #self.scoresDict[dead.score]='mlkia'
+        self.drawGenerationInfo()
 
     def isPopulationDead(self):
         return len(self.alive_agents)==0
@@ -100,3 +104,12 @@ class Generation():
             self.population[i].canMove=True
         
         self.alive_agents=self.population.copy()
+        self.popNumber+=1
+
+    def drawGenerationInfo(self):
+        font = pygame.font.Font('freesansbold.ttf', 20)
+        string="Generation #"+str(int(self.popNumber))
+        text = font.render( string , True, WHITE, None)
+        textRect = text.get_rect()
+        textRect.center = (1000,10)
+        self.screen.blit(text, textRect)

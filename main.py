@@ -39,11 +39,11 @@ def main():
 
             #update all agents
             generation.update()
-
+            
             pygame.display.update()
             clock.tick(30)
 
-        generation.selectKBestParents(K=6)
+        generation.selectKBestParents(K=8)
         print('parents\n',generation.parents)
         generation.getMates(n_offsprings=24)
         print('mates\n',generation.mates)
