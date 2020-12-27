@@ -4,7 +4,7 @@ class track(pygame.sprite.Sprite):
     def __init__(self,screen,lenWidth):
         pygame.sprite.Sprite.__init__(self)
         self.length,self.width=lenWidth
-        img = pygame.image.load('track_edited.png')
+        img = pygame.image.load('img/track_edited.png')
         self.image=pygame.transform.scale(img, (self.length,self.width)).convert_alpha() 
         self.rect = self.image.get_rect()
         self.rect.x,self.rect.y=0,0
