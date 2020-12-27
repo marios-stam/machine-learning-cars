@@ -7,6 +7,7 @@ from generations import Generation
 
 def main():
     global play_again
+    running = True
 
     windowLenWidth=(1200, 800)
     screen = pygame.display.set_mode(windowLenWidth)
@@ -18,12 +19,16 @@ def main():
     clock = pygame.time.Clock()
     
     offsprings=[]
-    n_generations=20
+    n_generations=40
     for i in range(n_generations):
         print('Generation #'+str(i))
-        generation=Generation(screen,race_track,offsprings=offsprings)
+        if offsprings==[]:
+            generation=Generation(screen,race_track,offsprings=offsprings)
+        else:
+            generation.updatePopulation(offsprings)
 
-        while not generation.isPopulationDead():
+        print('starting')
+        while not generation.isPopulationDead() and running==True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
@@ -38,14 +43,17 @@ def main():
             pygame.display.update()
             clock.tick(30)
 
-        generation.selectKBestParents(K=10)
-        print(generation.parents)
-        generation.getMates(n_offsprings=20)
-        print(generation.mates)
+        generation.selectKBestParents(K=6)
+        print('parents\n',generation.parents)
+        generation.getMates(n_offsprings=24)
+        print('mates\n',generation.mates)
         generation.combineMates()
-        print(generation.offsprings)
+        print('offsprings\n',generation.offsprings)
+        offsprings=generation.offsprings
 
-play_again=True
-while (play_again):
-    print("play again")
-    main()
+        if running==False:
+            break
+        
+
+main()
+    

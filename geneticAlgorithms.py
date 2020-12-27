@@ -22,10 +22,10 @@ class ga():
         return out
     
     @staticmethod
-    def addMutationstoArray(x,n_mutations=1):
+    def addMutationstoArray(x,n_mutations=4):
         indexes=random.sample(range(0, len(x) ), n_mutations)
         for i in indexes:
-            x[i]=np.random.uniform(-1,1)
+            x[i]=np.random.uniform(-0.2,0.2)
         return x
 
     @staticmethod

@@ -3,6 +3,7 @@ from position import pos
 from  colors import WHITE
 from math import sin,cos,tan,radians,degrees,pi,atan,sqrt
 import numpy as np
+from AI import AI
 
 class Player(pygame.sprite.Sprite):
     def __init__(self,screen,TrackObj,position=pos(64, 54)):
@@ -37,7 +38,8 @@ class Player(pygame.sprite.Sprite):
         self.draw()
 
         #init AI
-        #self.AI=createNeuralNet()
+        self.AI=AI(noofInputs=5,outputs=3)
+        self.AI.createNeuralNet(hiddenLayers=[4])
 
     def handle_keys(self):
         if not self.canMove:
@@ -63,6 +65,26 @@ class Player(pygame.sprite.Sprite):
         if key[pygame.K_DOWN]:
             self.orientation+=pi/10
             self.setOrientation(self.orientation)
+
+    def handleAIOutput(self):
+        x=self.AI.predict(self.distances)[0]
+        #print('prediction:',x)
+        l,up,r=x
+        threshold=0.4
+        #if up>0:
+        #    self.forward=self.forwardSpeed
+        
+        self.forward=self.forwardSpeed
+        if l>threshold:
+            self.delta=self.maxSteeringAngle
+        elif r>threshold:
+            self.delta=-self.maxSteeringAngle
+        
+        if l>threshold and r>threshold:
+            if l>r:
+                self.delta=self.maxSteeringAngle
+            else:
+                self.delta=-self.maxSteeringAngle
 
     def setOrientation(self,orient):
         self.image = pygame.transform.rotozoom(self.initial, degrees(orient)%360, 1)
@@ -166,13 +188,13 @@ class Player(pygame.sprite.Sprite):
             
             outOfBounds=False
             
-            if yn>screen_height:
-                print("opa")
+            if yn>screen_height or yn<0:
+                #print("opa")
                 #yn=int(screen_height)
                 yn=799
                 outOfBounds=True
-            if xn>screen_width:
-                print("opa2")
+            if xn>screen_width or xn<0:
+                #print("opa2")
                 #xn=int(screen_width)
                 xn=1199
                 outOfBounds=True

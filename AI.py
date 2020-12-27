@@ -1,6 +1,6 @@
 import numpy as np
-#from keras.layers import Dense
-#from keras.models import Sequential
+from keras.models import Sequential
+from keras.layers import Dense
 import random
 
 class AI():
@@ -8,23 +8,25 @@ class AI():
         self.noofInputs=5
         self.createNeuralNet()
 
-    def createNeuralNet(self,hiddenLayers=[2]):
+    def createNeuralNet(self,hiddenLayers=[4]):
         """Create Neural Net-#of Inputs=# of distances and 3 outputs matching ARROW_LEFT ARROW_UP ARROW_RIGHT"""
         model = Sequential()
         model.add(Dense(5, activation='relu', input_shape=(5,),bias=False ))
+
         for i in hiddenLayers:
             model.add(Dense(i, activation='relu',bias=False))
+        
         model.add(Dense(3, activation='sigmoid',bias=False))
         model.compile(optimizer='adam', loss='categorical_crossentropy')
         self.model=model
            
     def predict(self,distances):
-        left,up,down=self.model.predict(distances)
-        print(left,up,down)
-
+        #print(distances)
+        return self.model.predict(np.expand_dims(distances,axis=0))
+    
     def getWeightsVector(self):
         weights=np.array(self.model.get_weights() )
-        print(weights)
+        #print(weights)
 
         self.weightsShapes=[]
         self.weightsVector=[]
@@ -47,10 +49,15 @@ class AI():
             weights.append( data.reshape(shape) )
             start+=noofWeigths
         #print(self.weightsVector)
-        print("================================NEW WEIGTHS================================")
-        for i in weights:
-            print("================================================================")               
-            print(i)
-
+        #print("================================NEW WEIGTHS================================")
+        #for i in weights:
+        #    print("================================================================")               
+        #    print(i)
+        self.model.set_weights(weights)
+if __name__ == "__main__":
+    x=AI()
+    x.createNeuralNet()
+    distances=list(range(5))
+    x.predict(disatnces)
 
 
